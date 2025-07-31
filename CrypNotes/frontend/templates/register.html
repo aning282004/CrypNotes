@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register - CrypNotes</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Register</h2>
+    <form id="registerForm">
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit">Register</button>
+    </form>
+    <div id="result"></div>
+    <p style="text-align: center;">Already have an account? <a href="/login">Login</a></p>
+  </div>
+
+  <script>
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      const res = await fetch("/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+
+      const result = await res.json();
+      const resultDiv = document.getElementById("result");
+
+      if (res.ok) {
+        resultDiv.innerHTML = `<p style="color: green;">Registered successfully. Redirecting...</p>`;
+        setTimeout(() => window.location.href = "/login", 2000);
+      } else {
+        resultDiv.innerHTML = `<p style="color: red;">Error: ${result.detail}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>

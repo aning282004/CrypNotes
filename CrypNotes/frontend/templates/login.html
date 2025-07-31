@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - CrypNotes</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+    <div id="result"></div>
+    <p style="text-align: center;">Don't have an account? <a href="/register">Register</a></p>
+  </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const res = await fetch("/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+
+        const resultDiv = document.getElementById("result");
+        const data = await res.json();
+
+        if (res.ok) {
+          // Simpan ke localStorage
+          localStorage.setItem("token", data.access_token || "");
+          localStorage.setItem("username", username);
+
+          resultDiv.innerHTML = `<p style="color: green;">Login Success! Redirecting...</p>`;
+          setTimeout(() => {
+            window.location.href = "/dashboard";
+          }, 1500);
+        } else {
+          resultDiv.innerHTML = `<p style="color: red;">Login Failed: ${data.detail}</p>`;
+        }
+      } catch (err) {
+        document.getElementById("result").innerHTML = `<p style="color: red;">Error occurred during login</p>`;
+        console.error("Login error:", err);
+      }
+    });
+  </script>
+</body>
+</html>
